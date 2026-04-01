@@ -1,0 +1,63 @@
+# === Build output ===
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+
+# === Maven ===
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# === Gradle ===
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# === IDE - IntelliJ ===
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# === IDE - VS Code ===
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# === IDE - Eclipse ===
+.classpath
+.project
+.settings/
+bin/
+
+# === OS - macOS ===
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# === OS - Linux ===
+*~
+.nfs*
+.directory
+
+# === Spring Boot ===
+application-local.properties
+application-local.yml
+
+# === Logs ===
+*.log
+logs/
+
+# === Environment ===
+.env
+.env.local
+*.pem
+*.key
