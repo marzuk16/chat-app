@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-contacts
+      author: marzuk
+      changes:
+        - createTable:
+            tableName: contacts
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: contact_user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nickname
+                  type: varchar(100)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: contacts
+            baseColumnNames: user_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+            constraintName: fk_contacts_user
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: contacts
+            baseColumnNames: contact_user_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+            constraintName: fk_contacts_contact_user
+            onDelete: CASCADE
+        - addUniqueConstraint:
+            tableName: contacts
+            columnNames: user_id, contact_user_id
+            constraintName: uq_user_contact

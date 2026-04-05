@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: user-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/chatapp_users}
+    username: ${DB_USERNAME:chatapp}
+    password: ${DB_PASSWORD:chatapp}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+  kafka:
+    consumer:
+      group-id: user-service

@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: changes/001-create-media-metadata.yml
+      relativeToChangelogFile: true

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: changes/001-create-user-credentials.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/002-create-refresh-tokens.yml
+      relativeToChangelogFile: true

@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/users/**
+
+        - id: chat-service-rest
+          uri: lb://chat-service
+          predicates:
+            - Path=/api/v1/chats/**, /api/v1/messages/**
+
+        - id: chat-service-ws
+          uri: lb:ws://chat-service
+          predicates:
+            - Path=/ws/**
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/v1/notifications/**
+
+        - id: presence-service
+          uri: lb://presence-service
+          predicates:
+            - Path=/api/v1/presence/**
+
+        - id: media-service
+          uri: lb://media-service
+          predicates:
+            - Path=/api/v1/media/**
+
+jwt:
+  secret: ${JWT_SECRET:chat-app-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}

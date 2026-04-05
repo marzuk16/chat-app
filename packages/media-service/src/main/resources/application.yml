@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: media-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/chatapp_media}
+    username: ${DB_USERNAME:chatapp}
+    password: ${DB_PASSWORD:chatapp}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+  kafka:
+    consumer:
+      group-id: media-service
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:10MB}
+
+media:
+  storage:
+    location: ${STORAGE_PATH:./uploads}
