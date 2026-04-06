@@ -1,21 +1,21 @@
 ---
 name: Feature
 about: New feature
-title: "[Feature] "
+title: "[Service Name] Short description"
 labels: feature, backlog
 ---
 
-## Description
-Short description of the feature
+Description:
+Explain what needs to be done.
 
-## Tasks
-- [ ] API
-- [ ] UI
-- [ ] Validation
+Tasks:
+- Task 1
+- Task 2
 
-## Acceptance Criteria
-- [ ] Works as expected
-- [ ] No errors
+Acceptance Criteria:
+- [ ] Feature works
+- [ ] Edge cases handled
+- [ ] Tested via Postman
 
-## Notes
-Extra info if needed
+Notes:
+Optional extra info
