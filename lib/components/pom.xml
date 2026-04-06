@@ -15,7 +15,7 @@
 
     <groupId>com.marzuk</groupId>
     <artifactId>components</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
     <name>chat-app :: Lib :: Components</name>
     <description>Shared library — BaseEntity, DTOs, JWT utils, Kafka envelopes, exception handling, constants</description>

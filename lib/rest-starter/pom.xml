@@ -15,7 +15,7 @@
 
     <groupId>com.marzuk</groupId>
     <artifactId>rest-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
     <name>chat-app :: Lib :: Rest-Starter</name>
     <description>Common dependency bundle for backend REST microservices</description>
