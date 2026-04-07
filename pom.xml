@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.marzuk</groupId>
+    <artifactId>chat-app</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+
+    <name>chat-app</name>
+    <description>Real-time chat application — monorepo root aggregator</description>
+
+    <!-- ================================================================
+         Child modules — declared in dependency order.
+         lib/* resolves before packages/* that depend on them.
+         Each module independently inherits spring-boot-starter-parent.
+    ================================================================ -->
+    <modules>
+        <!-- Shared libraries -->
+        <module>lib/components</module>
+        <module>lib/rest-starter</module>
+        <module>lib/web-starter</module>
+
+        <!-- Services -->
+        <module>packages/config-server</module>
+        <module>packages/auth</module>
+        <module>packages/user</module>
+        <module>packages/chat</module>
+        <module>packages/notification</module>
+        <module>packages/storage</module>
+        <module>packages/api-gateway</module>
+        <module>packages/admin-portal</module>
+    </modules>
+
+</project>
