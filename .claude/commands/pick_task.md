@@ -42,26 +42,21 @@ git checkout -b feature/issue-$ARGUMENTS-<short-slug> origin/staging
 - Integration tests using Testcontainers for DB / Kafka / MinIO interactions.
 
 ### PR
+
+Read `.github/PULL_REQUEST_TEMPLATE.md`, fill in the placeholders based on the implementation, and set `Closes: #$ARGUMENTS`. Pass the populated content as the `--body` to `gh pr create`.
+
+Apply `--label` flags for:
+- **Service**: match the service the issue touches to one of: `common`, `config`, `gateway`, `auth`, `user`, `chat`, `media`, `notification`, `presence`, `admin`, `infrastructure`
+- **Type**: match the issue type to one of: `Feature`, `Task`, `🐞 Bug`
+- **Status**: always add `👋  Waiting For Review`
+
 ```bash
 gh pr create \
   --base staging \
   --title "<concise title> (#$ARGUMENTS)" \
-  --body "$(cat <<'EOF'
-## Summary
-- <bullet 1>
-- <bullet 2>
-
-## Changes
-- <layer-by-layer summary>
-
-## Test plan
-- [ ] Unit tests pass
-- [ ] Integration tests pass
-- [ ] Manual smoke-test steps
-
-Closes #$ARGUMENTS
-EOF
-)"
+  --label "<service>" \
+  --label "<Feature|Task|🐞 Bug>" \
+  --label "👋  Waiting For Review"
 ```
 
 Push the branch and return the PR URL to the user.

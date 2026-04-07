@@ -1,8 +1,10 @@
 ## Related Issue
-Closes #
+Closes:
+- #
 
 ## What I Did
--
+- <bullet 1>                                                                                                                                        
+- <bullet 2>
 
 ## How to Test
 -
