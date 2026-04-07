@@ -1,0 +1,59 @@
+package com.marzuk.components.pojos.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@EntityScan(basePackageClasses = BaseEntityTest.class)
+class BaseEntityTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Test
+    void idAndTimestampsArePopulatedOnPersist() {
+        SampleEntity sampleEntity = new SampleEntity();
+        sampleEntity.setTitle("sample");
+        sampleEntity.setCreatedBy("alice");
+        sampleEntity.setUpdatedBy("alice");
+
+        SampleEntity persistedEntity = entityManager.persistFlushFind(sampleEntity);
+
+        assertThat(persistedEntity.getId()).isNotNull();
+        assertThat(persistedEntity.getCreatedAt()).isNotNull();
+        assertThat(persistedEntity.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
+    void createdByIsImmutableAfterPersist() {
+        SampleEntity sampleEntity = new SampleEntity();
+        sampleEntity.setTitle("sample");
+        sampleEntity.setCreatedBy("alice");
+        sampleEntity.setUpdatedBy("alice");
+
+        SampleEntity persistedEntity = entityManager.persistFlushFind(sampleEntity);
+        assertThat(persistedEntity.getCreatedBy()).isEqualTo("alice");
+
+        persistedEntity.setUpdatedBy("bob");
+        SampleEntity updatedEntity = entityManager.persistFlushFind(persistedEntity);
+
+        assertThat(updatedEntity.getCreatedBy()).isEqualTo("alice");
+        assertThat(updatedEntity.getUpdatedBy()).isEqualTo("bob");
+    }
+
+    @Entity
+    @Table(name = "sample_entity")
+    static class SampleEntity extends BaseEntity {
+        private String title;
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+    }
+}
