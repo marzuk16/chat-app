@@ -1,7 +1,7 @@
 package com.marzuk.components.kafka;
 
-import com.marzuk.components.pojos.dto.kafka.EventSource;
-import com.marzuk.components.pojos.dto.kafka.EventType;
+import com.marzuk.components.pojos.enums.EventSource;
+import com.marzuk.components.pojos.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

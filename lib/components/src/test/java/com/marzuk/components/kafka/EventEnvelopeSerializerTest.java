@@ -1,8 +1,8 @@
 package com.marzuk.components.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.marzuk.components.pojos.dto.kafka.EventSource;
-import com.marzuk.components.pojos.dto.kafka.EventType;
+import com.marzuk.components.pojos.enums.EventSource;
+import com.marzuk.components.pojos.enums.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

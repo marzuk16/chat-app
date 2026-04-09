@@ -1,4 +1,4 @@
-package com.marzuk.components.pojos.dto.kafka;
+package com.marzuk.components.pojos.enums;
 
 public enum EventType {
     USER_REGISTERED,

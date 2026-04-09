@@ -1,7 +1,7 @@
 package com.marzuk.components.kafka;
 
-import com.marzuk.components.pojos.dto.kafka.EventSource;
-import com.marzuk.components.pojos.dto.kafka.EventType;
+import com.marzuk.components.pojos.enums.EventSource;
+import com.marzuk.components.pojos.enums.EventType;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
