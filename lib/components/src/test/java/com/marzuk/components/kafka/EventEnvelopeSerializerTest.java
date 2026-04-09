@@ -1,6 +1,8 @@
 package com.marzuk.components.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.marzuk.components.pojos.dto.kafka.EventSource;
+import com.marzuk.components.pojos.dto.kafka.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +37,7 @@ class EventEnvelopeSerializerTest {
 
     @Test
     void roundTrip_withStringPayload() {
-        EventEnvelope<String> original = EventEnvelope.of("USER_CREATED", "auth-service", "user-123");
+        EventEnvelope<String> original = EventEnvelope.of(EventType.USER_REGISTERED, EventSource.AUTH, "user-123");
 
         byte[] bytes = serializer.serialize("test-topic", original);
         EventEnvelope<?> deserialized = deserializer.deserialize("test-topic", bytes);
@@ -51,12 +53,12 @@ class EventEnvelopeSerializerTest {
     @Test
     void roundTrip_withMapPayload() {
         Map<String, Object> payloadData = Map.of("userId", "abc", "action", "login");
-        EventEnvelope<Map<String, Object>> original = EventEnvelope.of("AUTH_EVENT", "auth-service", payloadData);
+        EventEnvelope<Map<String, Object>> original = EventEnvelope.of(EventType.USER_LOCKED, EventSource.AUTH, payloadData);
 
         byte[] bytes = serializer.serialize("test-topic", original);
         EventEnvelope<?> deserialized = deserializer.deserialize("test-topic", bytes);
 
-        assertThat(deserialized.getEventType()).isEqualTo("AUTH_EVENT");
+        assertThat(deserialized.getEventType()).isEqualTo(EventType.USER_LOCKED);
         JsonNode payloadNode = (JsonNode) deserialized.getPayload();
         assertThat(payloadNode.get("action").asText()).isEqualTo("login");
         assertThat(payloadNode.get("userId").asText()).isEqualTo("abc");
@@ -65,7 +67,7 @@ class EventEnvelopeSerializerTest {
     @Test
     void roundTrip_withCustomPojoPayload() {
         UserCreatedPayload payloadData = new UserCreatedPayload("user-42", "alice@example.com");
-        EventEnvelope<UserCreatedPayload> original = EventEnvelope.of("USER_CREATED", "auth-service", payloadData);
+        EventEnvelope<UserCreatedPayload> original = EventEnvelope.of(EventType.USER_REGISTERED, EventSource.AUTH, payloadData);
 
         byte[] bytes = serializer.serialize("test-topic", original);
         EventEnvelope<?> deserialized = deserializer.deserialize("test-topic", bytes);

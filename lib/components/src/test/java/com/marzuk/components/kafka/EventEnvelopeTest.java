@@ -1,20 +1,20 @@
 package com.marzuk.components.kafka;
 
+import com.marzuk.components.pojos.dto.kafka.EventSource;
+import com.marzuk.components.pojos.dto.kafka.EventType;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import java.time.temporal.ChronoUnit;
 
 class EventEnvelopeTest {
 
     @Test
     void of_setsAllFieldsCorrectly() {
-        String eventType = "USER_CREATED";
-        String source = "auth-service";
+        EventType eventType = EventType.USER_REGISTERED;
+        EventSource source = EventSource.AUTH;
         String payload = "some-payload";
 
         EventEnvelope<String> envelope = EventEnvelope.of(eventType, source, payload);
@@ -28,8 +28,8 @@ class EventEnvelopeTest {
 
     @Test
     void of_generatesUniqueEventIds() {
-        EventEnvelope<String> first = EventEnvelope.of("EVENT", "service", "payload");
-        EventEnvelope<String> second = EventEnvelope.of("EVENT", "service", "payload");
+        EventEnvelope<String> first = EventEnvelope.of(EventType.MESSAGE_SENT, EventSource.CHAT, "payload");
+        EventEnvelope<String> second = EventEnvelope.of(EventType.MESSAGE_SENT, EventSource.CHAT, "payload");
 
         assertThat(first.getEventId()).isNotEqualTo(second.getEventId());
     }
@@ -37,7 +37,7 @@ class EventEnvelopeTest {
     @Test
     void of_timestampIsCloseToNow() {
         Instant before = Instant.now();
-        EventEnvelope<String> envelope = EventEnvelope.of("EVENT", "service", "payload");
+        EventEnvelope<String> envelope = EventEnvelope.of(EventType.MESSAGE_SENT, EventSource.CHAT, "payload");
         Instant after = Instant.now();
 
         assertThat(envelope.getTimestamp()).isBetween(before, after);
@@ -50,9 +50,9 @@ class EventEnvelopeTest {
 
         EventEnvelope<Integer> envelope = EventEnvelope.<Integer>builder()
                 .eventId(fixedId)
-                .eventType("ORDER_PLACED")
+                .eventType(EventType.ADMIN_BROADCAST)
                 .timestamp(fixedTime)
-                .source("order-service")
+                .source(EventSource.USER)
                 .payload(42)
                 .build();
 
