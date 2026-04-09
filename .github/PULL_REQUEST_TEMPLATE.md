@@ -1,6 +1,5 @@
 ## Related Issue
-Closes:
-- #
+Closes: #
 
 ## What I Did
 - <bullet 1>                                                                                                                                        

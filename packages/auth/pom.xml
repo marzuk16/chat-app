@@ -31,6 +31,15 @@
             <version>0.0.1</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+            <groupId>com.marzuk</groupId>
+            <artifactId>components</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
