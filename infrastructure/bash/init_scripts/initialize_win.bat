@@ -22,6 +22,8 @@ echo .env file generation has started ...
 (
     echo JWT_PRIVATE_KEY=%JWT_PRIVATE_KEY%
     echo JWT_PUBLIC_KEY=%JWT_PUBLIC_KEY%
+
+    echo ACTIVE_PROFILES=compose,dev
 ) > .env
 
 echo .env file generation done.

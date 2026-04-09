@@ -26,7 +26,7 @@ public class JwtUtil {
 
     public JwtUtil(JwtProperties jwtProperties) {
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            KeyFactory keyFactory = KeyFactory.getInstance(JwtConstants.KEY_ALGORITHM);
             byte[] publicKeyBytes = Base64.getDecoder().decode(jwtProperties.getPublicKey());
             this.publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
 

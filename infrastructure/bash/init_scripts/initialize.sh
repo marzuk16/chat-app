@@ -23,6 +23,8 @@ echo ".env file generation has started ..."
 cat > .env << ENDOFFILE
 JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
 JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+
+ACTIVE_PROFILES=compose,dev
 ENDOFFILE
 
 echo ".env file generation done."
