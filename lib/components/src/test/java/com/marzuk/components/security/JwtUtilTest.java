@@ -2,12 +2,14 @@ package com.marzuk.components.security;
 
 import com.marzuk.components.exception.UnauthorizedException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,18 +18,31 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtUtilTest {
 
-    private static final String SECRET_KEY = "test-secret-key-that-is-long-enough-for-hmac-sha256";
-    private static final String DIFFERENT_SECRET_KEY = "different-secret-key-that-is-long-enough-for-hmac";
+    private static KeyPair keyPair;
+    private static KeyPair differentKeyPair;
 
     private JwtUtil jwtUtil;
-    private SecretKey signingKey;
+    private PrivateKey signingKey;
+
+    @BeforeAll
+    static void generateKeys() throws Exception {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        keyPair = generator.generateKeyPair();
+        differentKeyPair = generator.generateKeyPair();
+    }
 
     @BeforeEach
     void setUp() {
+        String encodedPublicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        String encodedPrivateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
+
         JwtProperties jwtProperties = new JwtProperties();
-        jwtProperties.setSecretKey(SECRET_KEY);
+        jwtProperties.setPublicKey(encodedPublicKey);
+        jwtProperties.setPrivateKey(encodedPrivateKey);
+
         jwtUtil = new JwtUtil(jwtProperties);
-        signingKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+        signingKey = keyPair.getPrivate();
     }
 
     private String buildValidToken(UUID userId, String role, String email) {
@@ -110,14 +125,45 @@ class JwtUtilTest {
 
     @Test
     void validateToken_throwsForWrongSigningKey() {
-        SecretKey differentKey = Keys.hmacShaKeyFor(DIFFERENT_SECRET_KEY.getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder()
                 .subject(UUID.randomUUID().toString())
                 .expiration(new Date(System.currentTimeMillis() + 60_000))
-                .signWith(differentKey)
+                .signWith(differentKeyPair.getPrivate())
                 .compact();
 
         assertThatThrownBy(() -> jwtUtil.validateToken(token))
                 .isInstanceOf(UnauthorizedException.class);
+    }
+
+    @Test
+    void getSigningKey_returnsPrivateKeyWhenConfigured() {
+        assertThat(jwtUtil.getSigningKey()).isEqualTo(keyPair.getPrivate());
+    }
+
+    @Test
+    void constructor_succeedsWithoutPrivateKey() {
+        String encodedPublicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+
+        JwtProperties verifyOnlyProperties = new JwtProperties();
+        verifyOnlyProperties.setPublicKey(encodedPublicKey);
+
+        JwtUtil verifyOnlyUtil = new JwtUtil(verifyOnlyProperties);
+
+        UUID userId = UUID.randomUUID();
+        String token = buildValidToken(userId, "USER", "user@example.com");
+        assertThat(verifyOnlyUtil.extractUserId(token)).isEqualTo(userId);
+    }
+
+    @Test
+    void getSigningKey_throwsWhenPrivateKeyNotConfigured() {
+        String encodedPublicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+
+        JwtProperties verifyOnlyProperties = new JwtProperties();
+        verifyOnlyProperties.setPublicKey(encodedPublicKey);
+
+        JwtUtil verifyOnlyUtil = new JwtUtil(verifyOnlyProperties);
+
+        assertThatThrownBy(verifyOnlyUtil::getSigningKey)
+                .isInstanceOf(IllegalStateException.class);
     }
 }

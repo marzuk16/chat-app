@@ -3,10 +3,11 @@ spring:
     name: auth
 
 server:
-  port: 8081
+  port: 8080
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  public-key: ${JWT_PUBLIC_KEY}
+  private-key: ${JWT_PRIVATE_KEY}
 
 app:
   security:
