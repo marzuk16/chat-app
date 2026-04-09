@@ -1,12 +1,14 @@
 package com.marzuk.components.security;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "app.security")
 public class SecurityProperties {
 

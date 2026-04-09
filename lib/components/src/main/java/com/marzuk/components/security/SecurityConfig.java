@@ -1,10 +1,7 @@
-package com.marzuk.gateway.config;
+package com.marzuk.components.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marzuk.components.security.JwtAuthenticationFilter;
-import com.marzuk.components.security.JwtProperties;
-import com.marzuk.components.security.JwtUtil;
-import com.marzuk.components.security.SecurityProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,18 +14,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableConfigurationProperties({SecurityProperties.class, JwtProperties.class})
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final SecurityProperties securityProperties;
     private final ObjectMapper objectMapper;
-
-    public SecurityConfig(JwtUtil jwtUtil, SecurityProperties securityProperties, ObjectMapper objectMapper) {
-        this.jwtUtil = jwtUtil;
-        this.securityProperties = securityProperties;
-        this.objectMapper = objectMapper;
-    }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -37,13 +29,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String[] publicPaths = securityProperties.getPublicPaths().toArray(new String[0]);
+        String[] allowedPublicPaths = securityProperties.getPublicPaths().toArray(new String[0]);
 
         return http
+                // CSRF protection is disabled because this is a stateless REST API authenticated via JWT tokens.
+                // CSRF attacks exploit session cookies; token-based auth is not vulnerable to CSRF.
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicPaths).permitAll()
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(allowedPublicPaths).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

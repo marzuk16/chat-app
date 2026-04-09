@@ -28,6 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String ROLE_CLAIM = "role";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -39,16 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
             writeUnauthorized(response);
             return;
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(BEARER_PREFIX.length());
         try {
             Claims claims = jwtUtil.validateToken(token);
             String userId = claims.getSubject();
-            String role = claims.get("role", String.class);
+            String role = claims.get(ROLE_CLAIM, String.class);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId, null, List.of(new SimpleGrantedAuthority(role)));
             SecurityContextHolder.getContext().setAuthentication(authentication);
