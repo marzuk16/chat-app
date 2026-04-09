@@ -6,7 +6,7 @@ server:
   port: 8080
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  public-key: ${JWT_PUBLIC_KEY}
 
 app:
   security:

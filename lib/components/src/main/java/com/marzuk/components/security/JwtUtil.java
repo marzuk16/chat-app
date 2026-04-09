@@ -5,32 +5,57 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
 @Component
 public class JwtUtil {
 
-    private final SecretKey signingKey;
+    private final PublicKey publicKey;
+    private final PrivateKey privateKey;
 
     public JwtUtil(JwtProperties jwtProperties) {
-        this.signingKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(JwtConstants.KEY_ALGORITHM);
+            byte[] publicKeyBytes = Base64.getDecoder().decode(jwtProperties.getPublicKey());
+            this.publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+
+            if (jwtProperties.getPrivateKey() != null && !jwtProperties.getPrivateKey().isBlank()) {
+                byte[] privateKeyBytes = Base64.getDecoder().decode(jwtProperties.getPrivateKey());
+                this.privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            } else {
+                this.privateKey = null;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
+            throw new IllegalStateException("Failed to load RSA keys for JWT", exception);
+        }
+    }
+
+    public PrivateKey getSigningKey() {
+        if (privateKey == null) {
+            throw new IllegalStateException("JWT private key is not configured — this service cannot sign tokens");
+        }
+        return privateKey;
     }
 
     public Claims extractAllClaims(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith(signingKey)
+                    .verifyWith(publicKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException exception) {
-            // Return embedded claims so callers can inspect expiry (e.g. isTokenExpired)
             return exception.getClaims();
         } catch (JwtException | IllegalArgumentException exception) {
             throw new UnauthorizedException("Invalid or malformed JWT token");
