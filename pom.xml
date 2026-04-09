@@ -36,4 +36,45 @@
         <module>packages/admin-portal</module>
     </modules>
 
+    <!-- ================================================================
+         Init executions — initialise the project before first run.
+         Linux/Mac : mvn exec:exec@init -N
+         Windows   : mvn exec:exec@init-win -N
+    ================================================================ -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <!-- Linux / Mac -->
+                    <execution>
+                        <id>init</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>${project.basedir}/infrastructure/bash/init_scripts/initialize.sh</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Windows -->
+                    <execution>
+                        <id>init-win</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.basedir}/infrastructure/bash/init_scripts/initialize_win.bat</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

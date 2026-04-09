@@ -22,14 +22,14 @@
 
     <properties>
         <java.version>21</java.version>
-        <lombok.version>1.18.36</lombok.version>
     </properties>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.marzuk</groupId>
+            <artifactId>components</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>
@@ -45,13 +45,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
