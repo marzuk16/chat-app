@@ -1,0 +1,12 @@
+{
+    "permission": {
+        "allow": [
+            "Bash(find:*)",
+            "LS",
+            "Read",
+            "Glob",
+            "Grep"
+        ]
+    },
+    "enableAllProjectMcpServers": false
+}
