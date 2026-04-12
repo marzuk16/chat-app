@@ -1,12 +1,39 @@
 {
-    "permission": {
-        "allow": [
-            "Bash(find:*)",
-            "LS",
-            "Read",
-            "Glob",
-            "Grep"
-        ]
-    },
-    "enableAllProjectMcpServers": false
+  "permission": {
+    "allow": [
+      "LS",
+      "Read",
+      "Glob",
+      "Grep",
+
+      "Bash(find:*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git blame*)",
+      "Bash(git branch*)",
+      "Bash(git remote -v*)",
+      "Bash(git config --get*)",
+
+      "Bash(ls*)",
+      "Bash(cat*)",
+      "Bash(less*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(grep*)",
+      "Bash(find*)",
+      "Bash(tree*)",
+      "Bash(pwd*)",
+      "Bash(wc*)",
+      "Bash(diff*)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Write(/mnt/c/*)",
+      "Write(production.*)",
+      "Bash(rm -rf /)"
+    ]
+  },
+  "enableAllProjectMcpServers": false
 }
