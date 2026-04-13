@@ -21,10 +21,27 @@ rm -rf "$TEMP_DIR"
 echo ".env file generation has started ..."
 
 cat > .env << ENDOFFILE
+# JWT (generated — do not edit manually)
 JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
 JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
 
+# Spring
 ACTIVE_PROFILES=compose,dev
+JPA_DDL_AUTO=update
+
+# PostgreSQL
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+# MinIO
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+
+# Mail (Mailpit handles SMTP locally — no credentials needed)
+MAIL_USERNAME=
+MAIL_PASSWORD=
 ENDOFFILE
 
 echo ".env file generation done."
