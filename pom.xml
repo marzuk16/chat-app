@@ -26,7 +26,6 @@
         <module>lib/web-starter</module>
 
         <!-- Services -->
-        <module>packages/config-server</module>
         <module>packages/auth</module>
         <module>packages/user</module>
         <module>packages/chat</module>
