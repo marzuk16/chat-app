@@ -1,32 +1,24 @@
 {
   "permission": {
     "allow": [
-      "LS",
-      "Read",
-      "Glob",
-      "Grep",
-
-      "Bash(find:*)",
-      "Bash(git status*)",
-      "Bash(git log*)",
-      "Bash(git diff*)",
-      "Bash(git show*)",
-      "Bash(git blame*)",
-      "Bash(git branch*)",
-      "Bash(git remote -v*)",
-      "Bash(git config --get*)",
-
-      "Bash(ls*)",
-      "Bash(cat*)",
-      "Bash(less*)",
-      "Bash(head*)",
-      "Bash(tail*)",
-      "Bash(grep*)",
       "Bash(find*)",
-      "Bash(tree*)",
-      "Bash(pwd*)",
-      "Bash(wc*)",
-      "Bash(diff*)"
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git checkout*)",
+
+      "Edit",
+      "Write",
+      "Bash(mvn *)",
+
+      "Bash(gh issue view*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(gh pr checks*)",
+      "Bash(gh pr create*)",
+      "Bash(gh pr edit*)",
+      "Bash(gh repo view*)",
+      "Bash(gh project item-add*)",
+      "Bash(gh project item-edit*)"
     ],
     "deny": [
       "Read(.env*)",
