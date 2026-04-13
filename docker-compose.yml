@@ -1,0 +1,321 @@
+name: chat-app
+
+x-app-build: &app-build
+  context: .
+  dockerfile: infrastructure/docker/Dockerfile
+
+x-app-env: &app-env
+  JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
+  SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
+
+x-app-service: &app-service
+  restart: on-failure
+  deploy:
+    resources:
+      limits:
+        memory: 512M
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - dbnet
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - redisnet
+
+  kafka:
+    image: apache/kafka:3.9
+    ports:
+      - "127.0.0.1:9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - kafkanet
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - servicenet
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    restart: unless-stopped
+    networks:
+      - servicenet
+
+  # ---------------------------------------------------------------------------
+  # Application services
+  # ---------------------------------------------------------------------------
+
+  auth:
+    <<: *app-service
+    image: marzuk16/chat-auth:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/auth/target/auth.jar
+    ports:
+      - "127.0.0.1:8081:8080"
+      - "127.0.0.1:8091:8010"
+    environment:
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      AUTH_DB_URL: jdbc:postgresql://postgres:5432/auth_db
+      AUTH_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - servicenet
+      - dbnet
+
+  user:
+    <<: *app-service
+    image: marzuk16/chat-user:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/user/target/user.jar
+    ports:
+      - "127.0.0.1:8082:8080"
+      - "127.0.0.1:8092:8010"
+    environment:
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      USER_DB_URL: jdbc:postgresql://postgres:5432/user_db
+      USER_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      USER_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - servicenet
+      - dbnet
+      - redisnet
+      - kafkanet
+
+  chat:
+    <<: *app-service
+    image: marzuk16/chat-chat:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/chat/target/chat.jar
+    ports:
+      - "127.0.0.1:8083:8080"
+      - "127.0.0.1:8093:8010"
+    environment:
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      CHAT_DB_URL: jdbc:postgresql://postgres:5432/chat_db
+      CHAT_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      CHAT_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - servicenet
+      - dbnet
+      - redisnet
+      - kafkanet
+
+  notification:
+    <<: *app-service
+    image: marzuk16/chat-notification:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/notification/target/notification.jar
+    ports:
+      - "127.0.0.1:8084:8080"
+      - "127.0.0.1:8094:8010"
+    environment:
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      NOTIFICATION_DB_URL: jdbc:postgresql://postgres:5432/notification_db
+      NOTIFICATION_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      NOTIFICATION_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    networks:
+      - servicenet
+      - dbnet
+      - redisnet
+      - kafkanet
+
+  storage:
+    <<: *app-service
+    image: marzuk16/chat-storage:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/storage/target/storage.jar
+    ports:
+      - "127.0.0.1:8085:8080"
+      - "127.0.0.1:8095:8010"
+    environment:
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      STORAGE_DB_URL: jdbc:postgresql://postgres:5432/file_db
+      STORAGE_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      STORAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - servicenet
+      - dbnet
+
+  api-gateway:
+    <<: *app-service
+    image: marzuk16/chat-api-gateway:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/api-gateway/target/api-gateway.jar
+    ports:
+      - "127.0.0.1:8086:8080"
+      - "127.0.0.1:8096:8010"
+    environment:
+      <<: *app-env
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - servicenet
+      - redisnet
+
+  admin-portal:
+    <<: *app-service
+    image: marzuk16/chat-admin-portal:${TAG:-latest}
+    build:
+      <<: *app-build
+      args:
+        JAR_FILE: packages/admin-portal/target/admin-portal.jar
+    ports:
+      - "127.0.0.1:8087:8080"
+      - "127.0.0.1:8097:8010"
+    environment:
+      <<: *app-env
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+    networks:
+      - servicenet
+
+networks:
+  servicenet:
+  redisnet:
+  dbnet:
+  kafkanet:
+
+volumes:
+  postgres_data:
+  kafka_data:
+  minio_data:
