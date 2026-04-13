@@ -1,10 +1,15 @@
 package com.marzuk.authorizer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marzuk.components.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,23 +20,14 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class WebCookieJwtFilterTest {
 
-    @Mock
-    private JwtUtil jwtUtil;
+    @Mock private JwtUtil jwtUtil;
 
-    @Mock
-    private FilterChain filterChain;
+    @Mock private FilterChain filterChain;
 
-    @Mock
-    private Claims claims;
+    @Mock private Claims claims;
 
     private WebCookieJwtFilter filter;
 
@@ -41,7 +37,9 @@ class WebCookieJwtFilterTest {
         authorizerProperties.setPublicPaths(List.of("/login", "/actuator/health"));
         authorizerProperties.setCookieName("jwt");
 
-        filter = new WebCookieJwtFilter(jwtUtil, authorizerProperties, new ObjectMapper().findAndRegisterModules());
+        filter =
+                new WebCookieJwtFilter(
+                        jwtUtil, authorizerProperties, new ObjectMapper().findAndRegisterModules());
     }
 
     @AfterEach
@@ -110,7 +108,8 @@ class WebCookieJwtFilterTest {
         request.setCookies(new Cookie("jwt", token));
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        given(jwtUtil.validateToken(token)).willThrow(new UnauthorizedException("JWT token has expired"));
+        given(jwtUtil.validateToken(token))
+                .willThrow(new UnauthorizedException("JWT token has expired"));
 
         filter.doFilterInternal(request, response, filterChain);
 

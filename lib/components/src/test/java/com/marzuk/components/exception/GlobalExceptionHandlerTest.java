@@ -1,5 +1,7 @@
 package com.marzuk.components.exception;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.marzuk.components.exception.handler.GlobalExceptionHandler;
 import com.marzuk.components.pojos.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class GlobalExceptionHandlerTest {
 
@@ -48,10 +48,13 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleValidation_returnsBadRequestWithFieldErrors() {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "target");
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(new Object(), "target");
         bindingResult.addError(new FieldError("target", "email", "must not be blank"));
-        bindingResult.addError(new FieldError("target", "password", "size must be between 8 and 64"));
-        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
+        bindingResult.addError(
+                new FieldError("target", "password", "size must be between 8 and 64"));
+        MethodArgumentNotValidException exception =
+                new MethodArgumentNotValidException(null, bindingResult);
 
         ResponseEntity<Response<Void>> response = handler.handleValidation(exception);
 

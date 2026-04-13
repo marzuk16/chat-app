@@ -27,24 +27,31 @@ public class AuthorizerAutoConfiguration {
     static class GatewaySecurityConfig {
 
         @Bean
-        public GatewayJwtFilter gatewayJwtFilter(JwtUtil jwtUtil, AuthorizerProperties authorizerProperties,
-                                                 ObjectMapper objectMapper) {
+        public GatewayJwtFilter gatewayJwtFilter(
+                JwtUtil jwtUtil,
+                AuthorizerProperties authorizerProperties,
+                ObjectMapper objectMapper) {
             return new GatewayJwtFilter(jwtUtil, authorizerProperties, objectMapper);
         }
 
         @Bean
-        public SecurityFilterChain gatewaySecurityFilterChain(HttpSecurity http,
-                                                              AuthorizerProperties authorizerProperties,
-                                                              GatewayJwtFilter gatewayJwtFilter) throws Exception {
+        public SecurityFilterChain gatewaySecurityFilterChain(
+                HttpSecurity http,
+                AuthorizerProperties authorizerProperties,
+                GatewayJwtFilter gatewayJwtFilter)
+                throws Exception {
             String[] publicPaths = authorizerProperties.getPublicPaths().toArray(new String[0]);
 
-            return http
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authorizeHttpRequests(requests -> requests
-                            .requestMatchers(publicPaths).permitAll()
-                            .anyRequest().authenticated()
-                    )
+            return http.csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(
+                            session ->
+                                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(
+                            requests ->
+                                    requests.requestMatchers(publicPaths)
+                                            .permitAll()
+                                            .anyRequest()
+                                            .authenticated())
                     .addFilterBefore(gatewayJwtFilter, UsernamePasswordAuthenticationFilter.class)
                     .build();
         }
@@ -55,24 +62,31 @@ public class AuthorizerAutoConfiguration {
     static class WebSecurityConfig {
 
         @Bean
-        public WebCookieJwtFilter webCookieJwtFilter(JwtUtil jwtUtil, AuthorizerProperties authorizerProperties,
-                                                     ObjectMapper objectMapper) {
+        public WebCookieJwtFilter webCookieJwtFilter(
+                JwtUtil jwtUtil,
+                AuthorizerProperties authorizerProperties,
+                ObjectMapper objectMapper) {
             return new WebCookieJwtFilter(jwtUtil, authorizerProperties, objectMapper);
         }
 
         @Bean
-        public SecurityFilterChain webSecurityFilterChain(HttpSecurity http,
-                                                          AuthorizerProperties authorizerProperties,
-                                                          WebCookieJwtFilter webCookieJwtFilter) throws Exception {
+        public SecurityFilterChain webSecurityFilterChain(
+                HttpSecurity http,
+                AuthorizerProperties authorizerProperties,
+                WebCookieJwtFilter webCookieJwtFilter)
+                throws Exception {
             String[] publicPaths = authorizerProperties.getPublicPaths().toArray(new String[0]);
 
-            return http
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authorizeHttpRequests(requests -> requests
-                            .requestMatchers(publicPaths).permitAll()
-                            .anyRequest().authenticated()
-                    )
+            return http.csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(
+                            session ->
+                                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(
+                            requests ->
+                                    requests.requestMatchers(publicPaths)
+                                            .permitAll()
+                                            .anyRequest()
+                                            .authenticated())
                     .addFilterBefore(webCookieJwtFilter, UsernamePasswordAuthenticationFilter.class)
                     .build();
         }

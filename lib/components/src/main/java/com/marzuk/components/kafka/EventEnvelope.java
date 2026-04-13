@@ -2,14 +2,13 @@ package com.marzuk.components.kafka;
 
 import com.marzuk.components.pojos.enums.EventSource;
 import com.marzuk.components.pojos.enums.EventType;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @Setter

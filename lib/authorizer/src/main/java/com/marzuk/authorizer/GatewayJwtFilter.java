@@ -8,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,9 +18,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.List;
 
 @RequiredArgsConstructor
 public class GatewayJwtFilter extends OncePerRequestFilter {
@@ -32,7 +31,8 @@ public class GatewayJwtFilter extends OncePerRequestFilter {
     private static final String ROLE_CLAIM = "role";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         if (isPublicPath(request.getRequestURI())) {
@@ -51,8 +51,9 @@ public class GatewayJwtFilter extends OncePerRequestFilter {
             Claims claims = jwtUtil.validateToken(token);
             String userId = claims.getSubject();
             String role = claims.get(ROLE_CLAIM, String.class);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId, null, List.of(new SimpleGrantedAuthority(role)));
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userId, null, List.of(new SimpleGrantedAuthority(role)));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (UnauthorizedException exception) {
             writeUnauthorized(response);

@@ -20,8 +20,11 @@ public class EventEnvelopeDeserializer implements Deserializer<EventEnvelope<?>>
         }
         try {
             // Deserialize payload as JsonNode so each consumer can convert to its own type
-            return objectMapper.readValue(data, objectMapper.getTypeFactory()
-                    .constructParametricType(EventEnvelope.class, JsonNode.class));
+            return objectMapper.readValue(
+                    data,
+                    objectMapper
+                            .getTypeFactory()
+                            .constructParametricType(EventEnvelope.class, JsonNode.class));
         } catch (Exception exception) {
             throw new RuntimeException("Failed to deserialize EventEnvelope", exception);
         }

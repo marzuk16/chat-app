@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -30,7 +29,8 @@ public class JwtUtil {
 
             if (jwtProperties.getPrivateKey() != null && !jwtProperties.getPrivateKey().isBlank()) {
                 byte[] privateKeyBytes = Base64.getDecoder().decode(jwtProperties.getPrivateKey());
-                this.privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+                this.privateKey =
+                        keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
             } else {
                 this.privateKey = null;
             }
@@ -41,7 +41,8 @@ public class JwtUtil {
 
     public PrivateKey getSigningKey() {
         if (privateKey == null) {
-            throw new IllegalStateException("JWT private key is not configured — this service cannot sign tokens");
+            throw new IllegalStateException(
+                    "JWT private key is not configured — this service cannot sign tokens");
         }
         return privateKey;
     }
