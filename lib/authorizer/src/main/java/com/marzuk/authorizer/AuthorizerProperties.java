@@ -1,4 +1,4 @@
-package com.marzuk.components.security;
+package com.marzuk.authorizer;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +9,14 @@ import java.util.List;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "app.security")
-public class SecurityProperties {
+@ConfigurationProperties(prefix = "app.authorizer")
+public class AuthorizerProperties {
 
+    private Mode mode;
     private List<String> publicPaths = new ArrayList<>();
+    private String cookieName = "jwt";
+
+    public enum Mode {
+        GATEWAY, WEB
+    }
 }

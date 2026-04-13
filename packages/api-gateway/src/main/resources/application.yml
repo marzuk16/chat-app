@@ -24,7 +24,8 @@ jwt:
   public-key: ${JWT_PUBLIC_KEY}
 
 app:
-  security:
+  authorizer:
+    mode: gateway
     public-paths:
       - /api/auth/**
       - /actuator/health

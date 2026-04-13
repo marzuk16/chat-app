@@ -1,4 +1,4 @@
-package com.marzuk.components.security;
+package com.marzuk.authorizer;
 
 import com.marzuk.components.exception.UnauthorizedException;
 import io.jsonwebtoken.Jwts;

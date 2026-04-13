@@ -10,6 +10,9 @@ jwt:
   private-key: ${JWT_PRIVATE_KEY}
 
 app:
-  security:
+  authorizer:
+    mode: web
+    cookie-name: jwt
     public-paths:
+      - /login
       - /actuator/health

@@ -1,11 +1,10 @@
-package com.marzuk.components.security;
+package com.marzuk.authorizer;
 
 import com.marzuk.components.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -18,7 +17,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
-@Component
 public class JwtUtil {
 
     private final PublicKey publicKey;

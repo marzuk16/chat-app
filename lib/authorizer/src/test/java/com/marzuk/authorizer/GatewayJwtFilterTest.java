@@ -1,4 +1,4 @@
-package com.marzuk.components.security;
+package com.marzuk.authorizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marzuk.components.exception.UnauthorizedException;
@@ -21,13 +21,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class JwtAuthenticationFilterTest {
+class GatewayJwtFilterTest {
 
     @Mock
     private JwtUtil jwtUtil;
-
-    @Mock
-    private SecurityProperties securityProperties;
 
     @Mock
     private FilterChain filterChain;
@@ -35,12 +32,14 @@ class JwtAuthenticationFilterTest {
     @Mock
     private Claims claims;
 
-    private JwtAuthenticationFilter filter;
+    private GatewayJwtFilter filter;
 
     @BeforeEach
     void setUp() {
-        filter = new JwtAuthenticationFilter(jwtUtil, securityProperties, new ObjectMapper().findAndRegisterModules());
-        given(securityProperties.getPublicPaths()).willReturn(List.of("/api/auth/login", "/api/auth/register"));
+        AuthorizerProperties authorizerProperties = new AuthorizerProperties();
+        authorizerProperties.setPublicPaths(List.of("/api/auth/login", "/api/auth/register"));
+
+        filter = new GatewayJwtFilter(jwtUtil, authorizerProperties, new ObjectMapper().findAndRegisterModules());
     }
 
     @AfterEach
@@ -151,7 +150,9 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void publicPathWithAntPattern_skipsFilter() throws Exception {
-        given(securityProperties.getPublicPaths()).willReturn(List.of("/api/auth/**"));
+        AuthorizerProperties authorizerProperties = new AuthorizerProperties();
+        authorizerProperties.setPublicPaths(List.of("/api/auth/**"));
+        filter = new GatewayJwtFilter(jwtUtil, authorizerProperties, new ObjectMapper().findAndRegisterModules());
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/api/auth/refresh");

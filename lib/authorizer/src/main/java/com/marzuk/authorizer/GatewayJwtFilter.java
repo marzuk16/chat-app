@@ -1,4 +1,4 @@
-package com.marzuk.components.security;
+package com.marzuk.authorizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marzuk.components.exception.UnauthorizedException;
@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class GatewayJwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final SecurityProperties securityProperties;
+    private final AuthorizerProperties authorizerProperties;
     private final ObjectMapper objectMapper;
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isPublicPath(String requestUri) {
-        return securityProperties.getPublicPaths().stream()
+        return authorizerProperties.getPublicPaths().stream()
                 .anyMatch(pattern -> PATH_MATCHER.match(pattern, requestUri));
     }
 

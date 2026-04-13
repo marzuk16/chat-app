@@ -22,6 +22,7 @@
     <modules>
         <!-- Shared libraries -->
         <module>lib/components</module>
+        <module>lib/authorizer</module>
         <module>lib/rest-starter</module>
         <module>lib/web-starter</module>
 

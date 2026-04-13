@@ -32,8 +32,9 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>com.marzuk</groupId>
+            <artifactId>authorizer</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>
