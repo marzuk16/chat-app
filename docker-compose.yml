@@ -1,13 +1,14 @@
 name: chat-app
 
+x-app-build: &app-build
+  context: .
+  dockerfile: infrastructure/docker/Dockerfile
+
+x-app-env: &app-env
+  JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
+  SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
+
 x-app-service: &app-service
-  build:
-    context: .
-    dockerfile: infrastructure/docker/Dockerfile
-  environment:
-    JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-    SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-    JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
   restart: on-failure
   deploy:
     resources:
@@ -120,17 +121,15 @@ services:
     <<: *app-service
     image: marzuk16/chat-auth:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/auth/target/auth.jar
     ports:
       - "127.0.0.1:8081:8080"
       - "127.0.0.1:8091:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       AUTH_DB_URL: jdbc:postgresql://postgres:5432/auth_db
       AUTH_DB_USERNAME: ${POSTGRES_USER:-postgres}
       AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -145,17 +144,15 @@ services:
     <<: *app-service
     image: marzuk16/chat-user:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/user/target/user.jar
     ports:
       - "127.0.0.1:8082:8080"
       - "127.0.0.1:8092:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       USER_DB_URL: jdbc:postgresql://postgres:5432/user_db
       USER_DB_USERNAME: ${POSTGRES_USER:-postgres}
       USER_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -179,17 +176,15 @@ services:
     <<: *app-service
     image: marzuk16/chat-chat:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/chat/target/chat.jar
     ports:
       - "127.0.0.1:8083:8080"
       - "127.0.0.1:8093:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       CHAT_DB_URL: jdbc:postgresql://postgres:5432/chat_db
       CHAT_DB_USERNAME: ${POSTGRES_USER:-postgres}
       CHAT_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -213,17 +208,15 @@ services:
     <<: *app-service
     image: marzuk16/chat-notification:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/notification/target/notification.jar
     ports:
       - "127.0.0.1:8084:8080"
       - "127.0.0.1:8094:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       NOTIFICATION_DB_URL: jdbc:postgresql://postgres:5432/notification_db
       NOTIFICATION_DB_USERNAME: ${POSTGRES_USER:-postgres}
       NOTIFICATION_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -253,17 +246,15 @@ services:
     <<: *app-service
     image: marzuk16/chat-storage:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/storage/target/storage.jar
     ports:
       - "127.0.0.1:8085:8080"
       - "127.0.0.1:8095:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
-      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      <<: *app-env
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       STORAGE_DB_URL: jdbc:postgresql://postgres:5432/file_db
       STORAGE_DB_USERNAME: ${POSTGRES_USER:-postgres}
       STORAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -283,16 +274,14 @@ services:
     <<: *app-service
     image: marzuk16/chat-api-gateway:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/api-gateway/target/api-gateway.jar
     ports:
       - "127.0.0.1:8086:8080"
       - "127.0.0.1:8096:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
+      <<: *app-env
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
@@ -307,16 +296,14 @@ services:
     <<: *app-service
     image: marzuk16/chat-admin-portal:${TAG:-latest}
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
+      <<: *app-build
       args:
         JAR_FILE: packages/admin-portal/target/admin-portal.jar
     ports:
       - "127.0.0.1:8087:8080"
       - "127.0.0.1:8097:8010"
     environment:
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-      SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
+      <<: *app-env
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
     networks:

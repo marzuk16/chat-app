@@ -27,17 +27,17 @@ JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
 
 # Spring
 ACTIVE_PROFILES=compose,dev
-JPA_DDL_AUTO=update
+JPA_DDL_AUTO=validate
 
 # PostgreSQL
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_USER=${POSTGRES_USER:-postgres}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
 
 # MinIO
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
+MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
+MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
 
 # Mail (Mailpit handles SMTP locally — no credentials needed)
 MAIL_USERNAME=
