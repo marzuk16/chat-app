@@ -37,7 +37,6 @@ chat-app/
 │   ├── rest-starter/  # Dependency bundle for REST microservices (packaging: pom)
 │   └── web-starter/   # Dependency bundle for SSR web modules (packaging: pom)
 └── packages/     # Runnable services
-    ├── config-server/  # Spring Cloud Config Server
     ├── auth/           # JWT auth — registration, login, token refresh
     ├── user/           # Profiles, contacts, presence
     ├── chat/           # Conversations, messages, WebSocket
@@ -63,7 +62,7 @@ chat-app/
 | SpringDoc OpenAPI | 2.6.0 | Swagger UI on all REST services |
 | Testcontainers | 1.20.6 | Integration testing |
 
-Planned infrastructure (not yet wired): PostgreSQL, Redis, Kafka/Zookeeper, MinIO.
+Planned infrastructure (not yet wired): PostgreSQL, Redis, Kafka (KRaft mode — no ZooKeeper), MinIO (on dedicated VM in k8s; docker-compose for local dev).
 
 ## JAR Naming
 
@@ -71,6 +70,13 @@ All services set `<finalName>${project.artifactId}</finalName>`, so builds produ
 
 ## Configuration
 
-- Per-environment overrides go in `application-local.yml` (gitignored).
-- Secrets are managed via environment variables; see `.env.example`.
-- `config-server` will serve centralised configuration to all other services.
+- Configuration is injected via environment variables in all environments — locally from `.env` (gitignored; see `.env.example`), in Kubernetes from ConfigMaps and Secrets.
+- In Kubernetes, configuration is injected via ConfigMaps (non-sensitive) and Secrets (sensitive) — no Spring Cloud Config Server.
+
+## Infrastructure
+
+- **Local dev**: single `docker-compose.yml` at the project root covers all infrastructure (Postgres, Redis, Kafka in KRaft mode, MinIO) and all Spring Boot services. MinIO in docker-compose is for local dev only — in Kubernetes it runs on a dedicated VM outside the cluster.
+- **Kubernetes**: Helm charts under `infrastructure/cluster-setup/helm-charts/`. Per-environment values in `infrastructure/cluster-setup/build-env/`.
+- **Docker images**: each service has its own `Dockerfile` under `packages/{service}/Dockerfile`. Published to DockerHub as `marzuk16/chat-{service}:{version}`.
+- **CI/CD**: GitHub Actions — tests on PRs to `staging`, snapshot images on push to `test`, release images on `v*` tags.
+- **TLS**: cert-manager with Let's Encrypt on a self-hosted Kubernetes cluster, nginx ingress controller.
