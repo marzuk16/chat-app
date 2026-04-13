@@ -1,9 +1,9 @@
 package com.marzuk.components.exception;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class AppExceptionTest {
 
@@ -25,7 +25,8 @@ class AppExceptionTest {
 
     @Test
     void duplicateResourceException_hasConflictStatus() {
-        DuplicateResourceException exception = new DuplicateResourceException("Email already exists");
+        DuplicateResourceException exception =
+                new DuplicateResourceException("Email already exists");
 
         assertThat(exception.getStatus()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(exception.getMessage()).isEqualTo("Email already exists");

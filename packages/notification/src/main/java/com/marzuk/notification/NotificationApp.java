@@ -8,8 +8,7 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
 @Slf4j
 @SpringBootApplication(
         scanBasePackages = {"com.marzuk.notification", "com.marzuk.components"},
-        exclude = {UserDetailsServiceAutoConfiguration.class}
-)
+        exclude = {UserDetailsServiceAutoConfiguration.class})
 public class NotificationApp {
 
     public static void main(String[] args) {

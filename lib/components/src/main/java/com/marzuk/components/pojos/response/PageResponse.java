@@ -1,10 +1,9 @@
 package com.marzuk.components.pojos.response;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 @Getter
 @Builder

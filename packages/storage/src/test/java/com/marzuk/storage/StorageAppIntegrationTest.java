@@ -1,5 +1,11 @@
 package com.marzuk.storage;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Base64;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,28 +18,20 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Base64;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StorageAppIntegrationTest {
 
     @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
-            .withDatabaseName("file_db")
-            .withUsername("postgres")
-            .withPassword("postgres");
+    static final PostgreSQLContainer<?> postgres =
+            new PostgreSQLContainer<>("postgres:16-alpine")
+                    .withDatabaseName("file_db")
+                    .withUsername("postgres")
+                    .withPassword("postgres");
 
-    @LocalServerPort
-    int port;
+    @LocalServerPort int port;
 
-    @Autowired
-    TestRestTemplate restTemplate;
+    @Autowired TestRestTemplate restTemplate;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) throws Exception {
@@ -46,9 +44,11 @@ class StorageAppIntegrationTest {
         generator.initialize(2048);
         KeyPair keyPair = generator.generateKeyPair();
 
-        registry.add("jwt.public-key",
+        registry.add(
+                "jwt.public-key",
                 () -> Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded()));
-        registry.add("jwt.private-key",
+        registry.add(
+                "jwt.private-key",
                 () -> Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded()));
 
         registry.add("minio.endpoint", () -> "http://localhost:9000");
@@ -63,8 +63,9 @@ class StorageAppIntegrationTest {
 
     @Test
     void actuatorHealth_returnsUp_confirmingDatasourceConnected() {
-        ResponseEntity<Map> response = restTemplate.getForEntity(
-                "http://localhost:" + port + "/actuator/health", Map.class);
+        ResponseEntity<Map> response =
+                restTemplate.getForEntity(
+                        "http://localhost:" + port + "/actuator/health", Map.class);
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(response.getBody()).containsEntry("status", "UP");

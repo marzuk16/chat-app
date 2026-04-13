@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+echo "Running Spotless formatter check ..."
+mvn spotless:check -q
+echo "Formatter check passed."

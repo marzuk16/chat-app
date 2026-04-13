@@ -1,5 +1,7 @@
 package com.marzuk.components.pojos.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.Test;
@@ -8,14 +10,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DataJpaTest
 @EntityScan(basePackageClasses = BaseEntityTest.class)
 class BaseEntityTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @Autowired private TestEntityManager entityManager;
 
     @Test
     void idAndTimestampsArePopulatedOnPersist() {
@@ -53,7 +52,12 @@ class BaseEntityTest {
     static class SampleEntity extends BaseEntity {
         private String title;
 
-        public String getTitle() { return title; }
-        public void setTitle(String title) { this.title = title; }
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
     }
 }

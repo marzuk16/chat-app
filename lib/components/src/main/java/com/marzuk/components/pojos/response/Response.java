@@ -1,10 +1,9 @@
 package com.marzuk.components.pojos.response;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder
@@ -17,11 +16,7 @@ public class Response<T> {
     private List<String> errors;
 
     public static <T> Response<T> success(T data) {
-        return Response.<T>builder()
-                .success(true)
-                .data(data)
-                .timestamp(Instant.now())
-                .build();
+        return Response.<T>builder().success(true).data(data).timestamp(Instant.now()).build();
     }
 
     public static <T> Response<T> error(String message) {

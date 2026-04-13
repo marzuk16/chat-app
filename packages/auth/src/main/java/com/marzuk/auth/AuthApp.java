@@ -8,8 +8,7 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
 @Slf4j
 @SpringBootApplication(
         scanBasePackages = {"com.marzuk.auth", "com.marzuk.components"},
-        exclude = {UserDetailsServiceAutoConfiguration.class}
-)
+        exclude = {UserDetailsServiceAutoConfiguration.class})
 public class AuthApp {
 
     public static void main(String[] args) {
