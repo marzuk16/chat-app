@@ -14,12 +14,11 @@ spring:
         format_sql: true
         query:
           fail_on_pagination_over_collection_fetch: true
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+  flyway:
+    locations: classpath:db/migration
 
 logging:
   level:
-    liquibase: ${LIQUIBASE_LOG_LEVEL:DEBUG}
     org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:DEBUG}
     org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_BINDER_LOG_LEVEL:TRACE}
 
