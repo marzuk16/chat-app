@@ -1,5 +1,6 @@
 package com.marzuk.authorizer;
 
+import com.marzuk.components.pojos.enums.auth.AuthorizerMode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -11,12 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.authorizer")
 public class AuthorizerProperties {
 
-    private Mode mode;
+    private AuthorizerMode mode;
     private List<String> publicPaths = new ArrayList<>();
     private String cookieName = "jwt";
-
-    public enum Mode {
-        GATEWAY,
-        WEB
-    }
 }
