@@ -9,6 +9,11 @@ spring:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:validate}
     open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -21,6 +26,22 @@ logging:
 app:
   authorizer:
     mode: service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: 1
+    doc-expansion: none
 
 server:
   port: 8080
