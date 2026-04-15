@@ -27,7 +27,7 @@ services:
       - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/docker/postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -54,14 +54,14 @@ services:
       - redisnet
 
   kafka:
-    image: apache/kafka:3.9
+    image: apache/kafka:3.9.0
     ports:
       - "127.0.0.1:9092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://kafka:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
@@ -132,7 +132,7 @@ services:
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       AUTH_DB_URL: jdbc:postgresql://postgres:5432/auth_db
       AUTH_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
     depends_on:
       postgres:
         condition: service_healthy
@@ -155,7 +155,7 @@ services:
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       USER_DB_URL: jdbc:postgresql://postgres:5432/user_db
       USER_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      USER_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      USER_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -187,7 +187,7 @@ services:
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       CHAT_DB_URL: jdbc:postgresql://postgres:5432/chat_db
       CHAT_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      CHAT_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      CHAT_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -219,7 +219,7 @@ services:
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       NOTIFICATION_DB_URL: jdbc:postgresql://postgres:5432/notification_db
       NOTIFICATION_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      NOTIFICATION_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      NOTIFICATION_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -257,7 +257,7 @@ services:
       JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
       STORAGE_DB_URL: jdbc:postgresql://postgres:5432/file_db
       STORAGE_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      STORAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      STORAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
