@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -16,10 +18,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableConfigurationProperties({AuthorizerProperties.class, JwtProperties.class})
 public class AuthorizerAutoConfiguration {
 
+    private static final int BCRYPT_STRENGTH = 12;
+
     @Bean
     @ConditionalOnProperty(name = "jwt.public-key")
     public JwtUtil jwtUtil(JwtProperties jwtProperties) {
         return new JwtUtil(jwtProperties);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(BCRYPT_STRENGTH);
     }
 
     @Configuration
@@ -53,6 +62,21 @@ public class AuthorizerAutoConfiguration {
                                             .anyRequest()
                                             .authenticated())
                     .addFilterBefore(gatewayJwtFilter, UsernamePasswordAuthenticationFilter.class)
+                    .build();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnProperty(name = "app.authorizer.mode", havingValue = "service")
+    static class ServiceSecurityConfig {
+
+        @Bean
+        public SecurityFilterChain serviceSecurityFilterChain(HttpSecurity http) throws Exception {
+            return http.csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(
+                            session ->
+                                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
                     .build();
         }
     }

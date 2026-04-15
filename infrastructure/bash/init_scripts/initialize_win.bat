@@ -16,6 +16,14 @@ for /f "delims=" %%i in ('powershell -NoProfile -Command ^
     $rsa.ImportPkcs8PrivateKey([System.Convert]::FromBase64String('%JWT_PRIVATE_KEY%'), [ref]$null); ^
     [System.Convert]::ToBase64String($rsa.ExportSubjectPublicKeyInfo())"') do set JWT_PUBLIC_KEY=%%i
 
+:: Generate password pepper (32 random bytes, base64-encoded)
+echo Generating password pepper ...
+
+for /f "delims=" %%i in ('powershell -NoProfile -Command ^
+    "$bytes = New-Object byte[] 32; ^
+    [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes); ^
+    [System.Convert]::ToBase64String($bytes)"') do set AUTH_PASSWORD_PEPPER=%%i
+
 :: Apply defaults for sensitive values if not already set in the environment
 if not defined POSTGRES_USER set POSTGRES_USER=postgres
 if not defined POSTGRES_PASSWORD set POSTGRES_PASSWORD=postgres
@@ -28,12 +36,12 @@ if not defined MINIO_SECRET_KEY set MINIO_SECRET_KEY=minioadmin
 echo .env file generation has started ...
 
 (
-    echo # JWT (generated -- do not edit manually)
+    echo # Auth + JWT (generated -- do not edit manually)
+    echo AUTH_PASSWORD_PEPPER=%AUTH_PASSWORD_PEPPER%
     echo JWT_PRIVATE_KEY=%JWT_PRIVATE_KEY%
     echo JWT_PUBLIC_KEY=%JWT_PUBLIC_KEY%
     echo.
     echo # Spring
-    echo ACTIVE_PROFILES=compose,dev
     echo JPA_DDL_AUTO=validate
     echo.
     echo # PostgreSQL
@@ -49,6 +57,15 @@ echo .env file generation has started ...
     echo # Mail (Mailpit handles SMTP locally -- no credentials needed)
     echo MAIL_USERNAME=
     echo MAIL_PASSWORD=
+    echo.
+    echo # Dev overrides (secure defaults are in application.yml)
+    echo AUTH_DB_PASSWORD=%POSTGRES_PASSWORD%
+    echo FLYWAY_LOG_LEVEL=DEBUG
+    echo HIBERNATE_SQL_LOG_LEVEL=DEBUG
+    echo HIBERNATE_BINDER_LOG_LEVEL=TRACE
+    echo ACTUATOR_ENDPOINTS=*
+    echo ACTUATOR_HEALTH_DETAILS=always
+    echo SWAGGER_ENABLED=true
 ) > .env
 
 echo .env file generation done.

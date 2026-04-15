@@ -34,8 +34,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
+            <groupId>com.marzuk</groupId>
+            <artifactId>authorizer</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>

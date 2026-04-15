@@ -82,4 +82,23 @@ class AutoConfigurationTest {
     void noPublicKey_doesNotCreateJwtUtil() {
         contextRunner.run(context -> assertThat(context).doesNotHaveBean(JwtUtil.class));
     }
+
+    @Test
+    void serviceMode_permitsAllRequests_withNoJwtFilters() {
+        contextRunner
+                .withPropertyValues("app.authorizer.mode=service")
+                .run(
+                        context -> {
+                            assertThat(context).doesNotHaveBean(JwtUtil.class);
+                            assertThat(context).doesNotHaveBean(GatewayJwtFilter.class);
+                            assertThat(context).doesNotHaveBean(WebCookieJwtFilter.class);
+                        });
+    }
+
+    @Test
+    void passwordEncoder_isAlwaysCreated_regardlessOfMode() {
+        contextRunner.run(
+                context -> assertThat(context)
+                        .hasSingleBean(org.springframework.security.crypto.password.PasswordEncoder.class));
+    }
 }

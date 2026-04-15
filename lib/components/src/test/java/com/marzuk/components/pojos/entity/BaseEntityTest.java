@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -18,10 +19,11 @@ class BaseEntityTest {
 
     @Test
     void idAndTimestampsArePopulatedOnPersist() {
+        UUID userId = UUID.randomUUID();
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setTitle("sample");
-        sampleEntity.setCreatedBy("alice");
-        sampleEntity.setUpdatedBy("alice");
+        sampleEntity.setCreatedBy(userId);
+        sampleEntity.setUpdatedBy(userId);
 
         SampleEntity persistedEntity = entityManager.persistFlushFind(sampleEntity);
 
@@ -32,19 +34,21 @@ class BaseEntityTest {
 
     @Test
     void createdByIsImmutableAfterPersist() {
+        UUID originalUserId = UUID.randomUUID();
+        UUID newUpdaterId = UUID.randomUUID();
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setTitle("sample");
-        sampleEntity.setCreatedBy("alice");
-        sampleEntity.setUpdatedBy("alice");
+        sampleEntity.setCreatedBy(originalUserId);
+        sampleEntity.setUpdatedBy(originalUserId);
 
         SampleEntity persistedEntity = entityManager.persistFlushFind(sampleEntity);
-        assertThat(persistedEntity.getCreatedBy()).isEqualTo("alice");
+        assertThat(persistedEntity.getCreatedBy()).isEqualTo(originalUserId);
 
-        persistedEntity.setUpdatedBy("bob");
+        persistedEntity.setUpdatedBy(newUpdaterId);
         SampleEntity updatedEntity = entityManager.persistFlushFind(persistedEntity);
 
-        assertThat(updatedEntity.getCreatedBy()).isEqualTo("alice");
-        assertThat(updatedEntity.getUpdatedBy()).isEqualTo("bob");
+        assertThat(updatedEntity.getCreatedBy()).isEqualTo(originalUserId);
+        assertThat(updatedEntity.getUpdatedBy()).isEqualTo(newUpdaterId);
     }
 
     @Entity

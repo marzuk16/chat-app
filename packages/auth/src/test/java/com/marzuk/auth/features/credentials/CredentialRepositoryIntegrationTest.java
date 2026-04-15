@@ -9,6 +9,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,8 +59,8 @@ class CredentialRepositoryIntegrationTest {
                 .passwordHash("hashed-password")
                 .role(Role.USER)
                 .build();
-        credential.setCreatedBy("system");
-        credential.setUpdatedBy("system");
+        credential.setCreatedBy(UUID.randomUUID());
+        credential.setUpdatedBy(UUID.randomUUID());
         return credential;
     }
 

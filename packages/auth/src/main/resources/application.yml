@@ -4,19 +4,47 @@ spring:
   datasource:
     url: ${AUTH_DB_URL:jdbc:postgresql://localhost:5432/auth_db}
     username: ${AUTH_DB_USERNAME:postgres}
-    password: ${AUTH_DB_PASSWORD:postgres}
+    password: ${AUTH_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:validate}
     open-in-view: false
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    properties:
+      hibernate:
+        format_sql: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
+  flyway:
+    locations: classpath:db/migration
 
 logging:
   level:
-    liquibase: ${LIQUIBASE_LOG_LEVEL:DEBUG}
-    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_BINDER_LOG_LEVEL:TRACE}
+    org.flywaydb: ${FLYWAY_LOG_LEVEL:WARN}
+    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:WARN}
+    org.hibernate.orm.jdbc.bind: ${HIBERNATE_BINDER_LOG_LEVEL:WARN}
+
+app:
+  authorizer:
+    mode: service
+  security:
+    pepper: ${AUTH_PASSWORD_PEPPER}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
+  endpoint:
+    health:
+      show-details: ${ACTUATOR_HEALTH_DETAILS:never}
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+    default-models-expand-depth: 1
+    doc-expansion: none
 
 server:
   port: 8080

@@ -6,7 +6,6 @@ x-app-build: &app-build
 
 x-app-env: &app-env
   JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8010"
-  SPRING_PROFILES_ACTIVE: ${ACTIVE_PROFILES:-compose,dev}
 
 x-app-service: &app-service
   restart: on-failure
@@ -133,6 +132,7 @@ services:
       AUTH_DB_URL: jdbc:postgresql://postgres:5432/auth_db
       AUTH_DB_USERNAME: ${POSTGRES_USER:-postgres}
       AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      AUTH_PASSWORD_PEPPER: ${AUTH_PASSWORD_PEPPER}
     depends_on:
       postgres:
         condition: service_healthy

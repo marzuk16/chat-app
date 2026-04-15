@@ -1,4 +1,4 @@
-package com.marzuk.authorizer;
+package com.marzuk.components.constants;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
