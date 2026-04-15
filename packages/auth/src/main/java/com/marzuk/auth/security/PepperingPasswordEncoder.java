@@ -3,19 +3,16 @@ package com.marzuk.auth.security;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@RequiredArgsConstructor
 public class PepperingPasswordEncoder implements PasswordEncoder {
 
     private static final String HASH_ALGORITHM = "SHA-256";
 
     private final PasswordEncoder delegate;
     private final String pepper;
-
-    public PepperingPasswordEncoder(PasswordEncoder delegate, String pepper) {
-        this.delegate = delegate;
-        this.pepper = pepper;
-    }
 
     @Override
     public String encode(CharSequence rawPassword) {
