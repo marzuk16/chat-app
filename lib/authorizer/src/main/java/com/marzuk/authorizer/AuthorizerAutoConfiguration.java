@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableConfigurationProperties({AuthorizerProperties.class, JwtProperties.class})
 public class AuthorizerAutoConfiguration {
 
+    private static final int BCRYPT_STRENGTH = 12;
+
     @Bean
     @ConditionalOnProperty(name = "jwt.public-key")
     public JwtUtil jwtUtil(JwtProperties jwtProperties) {
@@ -26,7 +28,7 @@ public class AuthorizerAutoConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(BCRYPT_STRENGTH);
     }
 
     @Configuration

@@ -44,6 +44,7 @@ class RegistrationIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
         registry.add("app.authorizer.mode", () -> "service");
+        registry.add("app.security.pepper", () -> "test-pepper-value");
     }
 
     private String url(String path) {
@@ -59,7 +60,7 @@ class RegistrationIntegrationTest {
     private RegisterRequest validRequest(String email) {
         RegisterRequest request = new RegisterRequest();
         request.setEmail(email);
-        request.setPassword("Secret1234");
+        request.setPassword("Secret123456!!");
         request.setUsername("alice");
         return request;
     }

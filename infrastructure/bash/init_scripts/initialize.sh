@@ -17,6 +17,10 @@ JWT_PUBLIC_KEY=$(openssl rsa -pubin -in "$TEMP_DIR/public.pem" -outform DER 2>/d
 
 rm -rf "$TEMP_DIR"
 
+### Generate password pepper (32 random bytes, base64-encoded)
+echo "Generating password pepper ..."
+AUTH_PASSWORD_PEPPER=$(openssl rand -base64 32)
+
 ### Write .env file
 echo ".env file generation has started ..."
 
@@ -25,13 +29,16 @@ cat > .env << ENDOFFILE
 JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
 JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
 
+# Auth (generated — do not edit manually)
+AUTH_PASSWORD_PEPPER=${AUTH_PASSWORD_PEPPER}
+
 # Spring
 ACTIVE_PROFILES=compose,dev
 JPA_DDL_AUTO=validate
 
 # PostgreSQL
 POSTGRES_USER=${POSTGRES_USER:-postgres}
-POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
 
 # MinIO
 MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}

@@ -37,7 +37,7 @@ class CredentialServiceTest {
     private RegisterRequest buildRequest() {
         RegisterRequest request = new RegisterRequest();
         request.setEmail("alice@example.com");
-        request.setPassword("Secret1234");
+        request.setPassword("Secret123456!!");
         request.setUsername("alice");
         return request;
     }
@@ -52,7 +52,7 @@ class CredentialServiceTest {
         ReflectionTestUtils.setField(saved, "id", expectedId);
 
         when(credentialRepository.findByEmail("alice@example.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("Secret1234")).thenReturn("$2a$hashed");
+        when(passwordEncoder.encode("Secret123456!!")).thenReturn("$2a$hashed");
         when(credentialRepository.save(any(Credential.class))).thenReturn(saved);
 
         RegisterResponse response = credentialService.register(buildRequest(), UUID.randomUUID());
@@ -81,14 +81,14 @@ class CredentialServiceTest {
         ReflectionTestUtils.setField(saved, "id", UUID.randomUUID());
 
         when(credentialRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("Secret1234")).thenReturn("$2a$hashed");
+        when(passwordEncoder.encode("Secret123456!!")).thenReturn("$2a$hashed");
         when(credentialRepository.save(any(Credential.class))).thenReturn(saved);
 
         credentialService.register(buildRequest(), UUID.randomUUID());
 
-        verify(passwordEncoder).encode("Secret1234");
+        verify(passwordEncoder).encode("Secret123456!!");
         verify(credentialRepository).save(
                 argThat(credential -> "$2a$hashed".equals(credential.getPasswordHash())
-                        && !"Secret1234".equals(credential.getPasswordHash())));
+                        && !"Secret123456!!".equals(credential.getPasswordHash())));
     }
 }
