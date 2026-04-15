@@ -31,9 +31,9 @@ public abstract class BaseEntity {
 
     @Setter
     @Column(updatable = false, nullable = false)
-    private String createdBy;
+    private UUID createdBy;
 
     @Setter
     @Column(nullable = false)
-    private String updatedBy;
+    private UUID updatedBy;
 }
