@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<Response<Void>> handleAppException(AppException exception) {
-        log.debug("Application exception [{}]: {}", exception.getStatus(), exception.getMessage());
+        log.warn("Application exception [{}]: {}", exception.getStatus(), exception.getMessage());
         return ResponseEntity.status(exception.getStatus())
                 .body(Response.error(exception.getMessage()));
     }
@@ -29,6 +29,7 @@ public class GlobalExceptionHandler {
                         .map(FieldError::getDefaultMessage)
                         .toList();
 
+        log.warn("Validation failed on {}: {}", exception.getObjectName(), errors);
         return ResponseEntity.badRequest().body(Response.error("Validation failed", errors));
     }
 

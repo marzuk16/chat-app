@@ -33,7 +33,6 @@ JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
 AUTH_PASSWORD_PEPPER=${AUTH_PASSWORD_PEPPER}
 
 # Spring
-ACTIVE_PROFILES=compose,dev
 JPA_DDL_AUTO=validate
 
 # PostgreSQL
@@ -49,6 +48,15 @@ MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
 # Mail (Mailpit handles SMTP locally — no credentials needed)
 MAIL_USERNAME=
 MAIL_PASSWORD=
+
+# Dev overrides (secure defaults are in application.yml)
+AUTH_DB_PASSWORD=${POSTGRES_PASSWORD:-secret}
+FLYWAY_LOG_LEVEL=DEBUG
+HIBERNATE_SQL_LOG_LEVEL=DEBUG
+HIBERNATE_BINDER_LOG_LEVEL=TRACE
+ACTUATOR_ENDPOINTS=*
+ACTUATOR_HEALTH_DETAILS=always
+SWAGGER_ENABLED=true
 ENDOFFILE
 
 echo ".env file generation done."

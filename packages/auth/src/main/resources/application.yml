@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${AUTH_DB_URL:jdbc:postgresql://localhost:5432/auth_db}
     username: ${AUTH_DB_USERNAME:postgres}
-    password: ${AUTH_DB_PASSWORD:secret}
+    password: ${AUTH_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:validate}
@@ -19,9 +19,9 @@ spring:
 
 logging:
   level:
-    org.flywaydb: ${FLYWAY_LOG_LEVEL:DEBUG}
-    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_BINDER_LOG_LEVEL:TRACE}
+    org.flywaydb: ${FLYWAY_LOG_LEVEL:WARN}
+    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:WARN}
+    org.hibernate.orm.jdbc.bind: ${HIBERNATE_BINDER_LOG_LEVEL:WARN}
 
 app:
   authorizer:
@@ -33,15 +33,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
   endpoint:
     health:
-      show-details: always
+      show-details: ${ACTUATOR_HEALTH_DETAILS:never}
       probes:
         enabled: true
 
 springdoc:
   swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
     default-models-expand-depth: 1
     doc-expansion: none
 

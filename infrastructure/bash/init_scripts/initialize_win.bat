@@ -42,7 +42,6 @@ echo .env file generation has started ...
     echo JWT_PUBLIC_KEY=%JWT_PUBLIC_KEY%
     echo.
     echo # Spring
-    echo ACTIVE_PROFILES=compose,dev
     echo JPA_DDL_AUTO=validate
     echo.
     echo # PostgreSQL
@@ -58,6 +57,15 @@ echo .env file generation has started ...
     echo # Mail (Mailpit handles SMTP locally -- no credentials needed)
     echo MAIL_USERNAME=
     echo MAIL_PASSWORD=
+    echo.
+    echo # Dev overrides (secure defaults are in application.yml)
+    echo AUTH_DB_PASSWORD=%POSTGRES_PASSWORD%
+    echo FLYWAY_LOG_LEVEL=DEBUG
+    echo HIBERNATE_SQL_LOG_LEVEL=DEBUG
+    echo HIBERNATE_BINDER_LOG_LEVEL=TRACE
+    echo ACTUATOR_ENDPOINTS=*
+    echo ACTUATOR_HEALTH_DETAILS=always
+    echo SWAGGER_ENABLED=true
 ) > .env
 
 echo .env file generation done.
