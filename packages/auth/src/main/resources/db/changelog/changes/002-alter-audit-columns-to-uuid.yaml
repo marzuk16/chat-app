@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-alter-audit-columns-to-uuid
+      author: marzuk
+      changes:
+        - sql:
+            sql: ALTER TABLE credentials ALTER COLUMN created_by TYPE uuid USING created_by::uuid;
+        - sql:
+            sql: ALTER TABLE credentials ALTER COLUMN updated_by TYPE uuid USING updated_by::uuid;
